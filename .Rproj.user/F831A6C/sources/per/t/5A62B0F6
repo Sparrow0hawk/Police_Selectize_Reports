@@ -5,15 +5,15 @@
     "dirty" : false,
     "encoding" : "UTF-8",
     "folds" : "",
-    "hash" : "0",
+    "hash" : "1640164451",
     "id" : "5A62B0F6",
-    "lastKnownWriteTime" : 1568725514,
-    "last_content_update" : 1568725514570,
+    "lastKnownWriteTime" : 1568726008,
+    "last_content_update" : 1568726008992,
     "path" : "~/Code/R_scripts/Police_Selectize_Reports/app.R",
     "project_path" : "app.R",
     "properties" : {
-        "cursorPosition" : "96,14",
-        "scrollLine" : "79"
+        "cursorPosition" : "45,79",
+        "scrollLine" : "33"
     },
     "read_only" : false,
     "read_only_alternatives" : [

@@ -40,7 +40,14 @@ body <- dashboardBody(
     
     # create a row for controls
     fluidRow(
-        box(# time slider
+        box(width = NULL,
+            solidHeader = FALSE,
+            # text input section
+            textInput(inputId = 'keyword_text', label = 'Enter keyword(s):', value = ""),
+            htmlOutput(outputId = 'rejected_terms'),
+            actionButton(inputId = 'submit_text', label = 'Submit'),
+            plotlyOutput("wordbymonth"),
+        # time slider
             sliderInput('MonYear','Select a Month over 1 year:',
                         min = min(1),
                         max = max(12),
@@ -59,15 +66,7 @@ body <- dashboardBody(
         column(width = 4,
                box(width = NULL,
                    solidHeader = FALSE,
-                   plotlyOutput('topicstimeplot')),
-               box(width = NULL,
-                   solidHeader = FALSE,
-                   # text input section
-                   textInput(inputId = 'keyword_text', label = 'Enter keyword(s):', value = ""),
-                   htmlOutput(outputId = 'rejected_terms'),
-                   actionButton(inputId = 'submit_text', label = 'Submit'),
-                   plotlyOutput("wordbymonth")
-               )
+                   plotlyOutput('topicstimeplot'))
         )
     )
 )
