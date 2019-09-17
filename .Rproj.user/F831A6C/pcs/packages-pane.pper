@@ -1,0 +1,7 @@
+{
+    "installOptions" : {
+        "installDependencies" : true,
+        "installFromRepository" : true,
+        "libraryPath" : "/home/alex/Code/R_scripts/Police_Selectize_Reports/packrat/lib/x86_64-pc-linux-gnu/3.4.4"
+    }
+}

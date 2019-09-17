@@ -1,0 +1,8 @@
+# gitignore file for Police Selectize reports
+
+# packrat
+
+packrat/*
+!packrat/packrat.lock
+!packrat/init.R
+!packrat/packrat.opts

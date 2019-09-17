@@ -1,0 +1,25 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1568715156362.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "5A62B0F6",
+    "lastKnownWriteTime" : 1568715151,
+    "last_content_update" : 1568715151,
+    "path" : "~/Code/R_scripts/Police_Selectize_Reports/app.R",
+    "project_path" : "app.R",
+    "properties" : {
+        "cursorPosition" : "19,0",
+        "scrollLine" : "8"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}
