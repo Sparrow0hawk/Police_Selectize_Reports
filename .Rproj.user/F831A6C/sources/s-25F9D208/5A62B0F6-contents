@@ -1,16 +1,18 @@
-
+library(here)
+source(here('R','police-selectize-functions.R'))
 library(shiny)
 library(leaflet)
-library(here)
 library(shinydashboard)
 library(geojsonio)
 library(plotly)
 
 # load data sources
 
-PC_to_LSOA <- data.frame(read.csv(here('src','PC_to_LSOA_dec2011.csv')))
+datalist <- load_data(csv_file='/media/sf_Project_1_-_NLP_Safer_Leeds_Crime_MO/Project/Data/Data_v3_year1.csv')
 
-police_dataframe <- data.frame(read.csv('/media/sf_Project_1_-_NLP_Safer_Leeds_Crime_MO/Project/Data/Data_v3_year1.csv'))
+PC_to_LSOA <- datalist$PCdata
+
+police_dataframe <- datalist$policedata
 
 ### Section for matching partial postcode to MSOA
 
