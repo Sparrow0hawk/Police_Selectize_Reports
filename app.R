@@ -1,8 +1,7 @@
-
+library(here)
 source(here('R','police-selectize-functions.R'))
 library(shiny)
 library(leaflet)
-library(here)
 library(shinydashboard)
 library(geojsonio)
 library(plotly)
@@ -17,22 +16,11 @@ police_dataframe <- datalist$policedata
 
 ### Section for matching partial postcode to MSOA
 
-# remove whitespace from partialpostcode column and PCD7 col 
-police_dataframe$PartialPostCode <- gsub(' ', '', police_dataframe$PartialPostCode)
-
-PC_to_LSOA$PCD7 <- gsub(' ', '', PC_to_LSOA$PCD7)
-
-# get MSOA codes
-police_dataframe$MSOA <- sapply(police_dataframe[,'PartialPostCode'], function(x) as.character(unique(PC_to_LSOA[grep(x, PC_to_LSOA$PCD7),]$MSOA11CD)))
-
-# get LAD
-police_dataframe$LAD <- sapply(police_dataframe[,'MSOA'], function(x) as.character(unique(PC_to_LSOA[PC_to_LSOA$MSOA11CD %in% x,]$LAD11CD)))
+police_dataframe <- extract_MSOA(police_dataframe, PC_to_LSOA)
 
 ### Section getting LAD MSOA map
 
-LAD_name <- unique(police_dataframe$LAD)[1]
-
-geojsonfile <- geojsonio::geojson_read(paste0('https://raw.githubusercontent.com/martinjc/UK-GeoJSON/master/json/statistical/eng/msoa_by_lad/',trimws(LAD_name),'.json'), what = 'sp')
+geomapfile <- get_geojson(police_dataframe)
 
 ### UI section ###
 

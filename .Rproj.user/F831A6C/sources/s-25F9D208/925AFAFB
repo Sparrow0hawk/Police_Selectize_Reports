@@ -5,15 +5,15 @@
     "dirty" : false,
     "encoding" : "UTF-8",
     "folds" : "",
-    "hash" : "1862392136",
+    "hash" : "3145930756",
     "id" : "925AFAFB",
-    "lastKnownWriteTime" : 1568805215,
-    "last_content_update" : 1568805215897,
+    "lastKnownWriteTime" : 1568812680,
+    "last_content_update" : 1568812680659,
     "path" : "~/Code/R_scripts/Police_Selectize_Reports/R/police-selectize-functions.R",
     "project_path" : "R/police-selectize-functions.R",
     "properties" : {
-        "cursorPosition" : "56,0",
-        "scrollLine" : "38"
+        "cursorPosition" : "67,21",
+        "scrollLine" : "48"
     },
     "read_only" : false,
     "read_only_alternatives" : [

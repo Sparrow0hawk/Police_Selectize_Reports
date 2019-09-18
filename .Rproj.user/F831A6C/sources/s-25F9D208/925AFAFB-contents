@@ -1,6 +1,7 @@
 # functions script
 library(tidyverse)
 library(here)
+library(geojsonio)
 
 
 load_data <- function(csv_file) {
@@ -43,12 +44,12 @@ extract_MSOA <- function(dataframe, PC_frame) {
       (new_df %>% 
          select(PartialPostCode) %>% 
          left_join((PC_frame %>% 
-                      select(ladnm,pcd7) %>%
+                      select(ladcd,pcd7) %>%
                       mutate(partial= substr(pcd7,1,nchar(pcd7)-2))), 
                    by=c("PartialPostCode"="partial")) %>% 
-         distinct(PartialPostCode,ladnm) %>% 
+         distinct(PartialPostCode,ladcd) %>% 
          group_by(PartialPostCode) %>%
-         mutate(LAD=paste0(ladnm,collapse = ",")) %>% 
+         mutate(LAD=paste0(ladcd,collapse = ",")) %>% 
          distinct(PartialPostCode, LAD)),by = c("PartialPostCode"="PartialPostCode")
     )
         
@@ -56,7 +57,16 @@ extract_MSOA <- function(dataframe, PC_frame) {
 }
 
 
-
+get_geojson <- function(dataframe) {
+  
+  # assumed only one LAD in dataframe
+  LAD_name <- unique(dataframe$LAD)[1]
+  
+  # loads geojson file
+  geojsonfile <- geojsonio::geojson_read(paste0('https://raw.githubusercontent.com/martinjc/UK-GeoJSON/master/json/statistical/eng/msoa_by_lad/',trimws(LAD_name),'.json'), what = 'sp')
+  
+  return(geojsonfile)
+}
   
   
   

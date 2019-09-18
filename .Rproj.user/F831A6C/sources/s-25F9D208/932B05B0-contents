@@ -31,8 +31,16 @@ test_that("test_extract_MSOA", {
   
   expect_equal(new_frame$MSOA[1], 'E02002340,E02002339,E02002336,E02002343,E02002338')
   
-  expect_equal(new_frame$LAD[1], 'Leeds')
+  expect_equal(new_frame$LAD[1], 'E08000035')
   
 })
 
-
+test_that("test_get_geojson", {
+  
+  test_df <- data.frame(read.csv(here('tests','test_data','test_geojson.csv')))
+  
+  getfile <- get_geojson(test_df)
+  
+  expect_equal(as.character(getfile@data[[1]][1]), 'E02002330')
+  
+})
