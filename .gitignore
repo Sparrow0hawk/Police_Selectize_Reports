@@ -6,3 +6,5 @@ packrat/*
 !packrat/packrat.lock
 !packrat/init.R
 !packrat/packrat.opts
+
+.Rproj.user/*

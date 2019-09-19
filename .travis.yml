@@ -1,0 +1,16 @@
+language: r
+
+branches:
+  only:
+    - master
+    - develop
+
+install:
+  - R -e 'if (system.file(package="packrat") == "") install.packages("packrat")'
+  - R -e "packrat::packify(); packrat::restore()"
+
+
+script:
+  - R -f tests/test-all.R
+
+#TODO: coverage and check this actually works
