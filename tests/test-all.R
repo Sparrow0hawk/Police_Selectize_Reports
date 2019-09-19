@@ -3,10 +3,7 @@ library(here)
 
 source(here('R','police-selectize-functions.R'))
 
-# helper function
-'%!in%' <- function(x,y)!('%in%'(x,y))
 
-#main functions
 test_that("test_load_data", {
   
   csv_path <- here('tests','test_data','test_load.csv')
@@ -70,3 +67,34 @@ test_that("test_getDTM", {
   expect_true(DTM$dimnames$Terms[1] == 'jesus')
   
 })
+
+test_that("test_countMSOA", {
+  
+  test_data <- data.frame(read.csv(here('tests','test_data','test_countMSOA.csv')))
+  
+  test_geo <- geojsonio::geojson_read('https://raw.githubusercontent.com/martinjc/UK-GeoJSON/master/json/statistical/eng/msoa_by_lad/E08000035.json', what = 'sp')
+  
+  OA_count_lst <- count_MSOAs(test_data, test_geo)$OA_count
+  
+  OA_text <- count_MSOAs(test_data, test_geo)$text_reports
+  
+  expect_equal(OA_count_lst[OA_count_lst$code == 'E02006875',]$freq, 4)
+  
+  expect_equal(dim(OA_text)[1], 18)
+  
+  expect_equal(OA_text$CrimeNotes[6], 
+               "Suspect stopped victim in alley intimidated into handing over mobile phone")
+})
+
+
+test_that("test_toMonth", {
+  
+  test_data <- data.frame(read.csv(here('tests','test_data','test_countMSOA.csv')))
+  
+  new_frame <- map_Months(test_data)
+  
+  expect_true('Month2' %in% colnames(new_frame))
+  
+  expect_equal(new_frame$Month2[6], 9)
+})
+

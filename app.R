@@ -8,8 +8,17 @@ library(reshape2)
 library(plotly)
 
 # load data sources
+if (strsplit(getwd(), '/')[[1]][2] == 'Users') {
+    
+    test_dir <- here('tests','test_data','test_input.csv')
+    
+} else {
+    
+    test_dir <- '/media/sf_Project_1_-_NLP_Safer_Leeds_Crime_MO/Project/Data/Data_v3_year1.csv'
+}
 
-datalist <- load_data(csv_file='/media/sf_Project_1_-_NLP_Safer_Leeds_Crime_MO/Project/Data/Data_v3_year1.csv')
+
+datalist <- load_data(csv_file=test_dir)
 
 PC_to_LSOA <- datalist$PCdata
 
@@ -19,17 +28,13 @@ police_dataframe <- datalist$policedata
 
 police_dataframe <- extract_MSOA(police_dataframe, PC_to_LSOA)
 
+### Add numeric month column
+
+police_dataframe <- map_Months(police_dataframe)
+
 ### Section getting LAD MSOA map
 
 geojsonfile <- get_geojson(police_dataframe)
-
-
-### produce corpus
-
-text_corpus <- tokenize_corpus(police_dataframe$CrimeNotes)
-
-# get doctermmatrix
-DTM <- build_DocTermMatrix(0.05, 0.8, text_corpus)
 
 
 ### UI section ###
@@ -47,7 +52,6 @@ body <- dashboardBody(
             textInput(inputId = 'keyword_text', label = 'Enter keyword(s):', value = ""),
             htmlOutput(outputId = 'rejected_terms'),
             actionButton(inputId = 'submit_text', label = 'Submit'),
-            plotlyOutput("wordbymonth"),
         # time slider
             sliderInput('MonYear','Select a Month over 1 year:',
                         min = min(1),
@@ -67,7 +71,7 @@ body <- dashboardBody(
         column(width = 4,
                box(width = NULL,
                    solidHeader = FALSE,
-                   plotlyOutput('topicstimeplot'))
+                   plotlyOutput("wordbymonth"))
         )
     )
 )
@@ -82,7 +86,24 @@ ui <- dashboardPage(
 # Define server logic required to draw a histogram
 server <- function(input, output) {
     
-    observeEvent({input$submit_text},{
+    observeEvent(
+        {input$submit_text
+         input$MonYear}, {
+             
+             new_pol_frame <- police_dataframe[which(police_dataframe$Month2 %in% c(input$MonYear[1]:input$MonYear[2])),]
+             
+             lsoa_full <- count_MSOAs(new_pol_frame, geojsonfile)$OA_count
+             
+             reports <- count_MSOAs(new_pol_frame, geojsonfile)$text_reports
+             
+             ### produce corpus
+             
+             text_corpus <- tokenize_corpus(new_pol_frame$CrimeNotes)
+             
+             # get doctermmatrix
+             DTM <- build_DocTermMatrix(0.05, 0.8, text_corpus)
+        
+        
         # lets build in a level of reactivity so a user can specify a key word
         terms <- as.character(input$keyword_text)
         
@@ -123,13 +144,16 @@ server <- function(input, output) {
             
         }
 
-        counts_per_decade <- aggregate(reduced_DTM, by = list(Month = police_dataframe$Month), sum)
+        counts_per_decade <- aggregate(reduced_DTM, 
+                                       by = list(Month = new_pol_frame$Month2), 
+                                       sum)
 
         wordcountsdecade.tall <- melt(counts_per_decade,
                                       variable.name = 'Word',
                                       value.names = 'count',
-                                      id.vars = ('Month'))
-        print('runs past topic model bit')
+                                      id.vars = ('Month')
+                                      )
+        
         
         # x axis specification
         axaxis <- list(
@@ -158,6 +182,8 @@ server <- function(input, output) {
         )
     })
 
+    pal <- colorNumeric(c('white', 'red'), domain = lsoa_full$freq)
+    
     output$mymap <- renderLeaflet({
         leafletOptions(maxZoom = 10)
         leaflet(geojsonfile) %>%
@@ -166,10 +192,10 @@ server <- function(input, output) {
                         stroke = TRUE,
                         color = "black",
                         fillOpacity=0.7,
-                        #fillColor = ~pal(lsoa_full$freq),
+                        fillColor = ~pal(lsoa_full$freq),
                         dashArray = 2,
-                        weight = 0.7
-                        #popup = paste(lsoa_full$CrimeNotes)
+                        weight = 0.7,
+                        popup = paste(lsoa_full$CrimeNotes)
             ) 
         
     })
@@ -177,3 +203,4 @@ server <- function(input, output) {
 
 # Run the application 
 shinyApp(ui = ui, server = server)
+

@@ -4,7 +4,10 @@ library(here)
 library(geojsonio)
 library(tm)
 
+# helper function
+'%!in%' <- function(x,y)!('%in%'(x,y))
 
+#main functions
 load_data <- function(csv_file) {
   
   PC_to_LSOA <- data.frame(read.csv(here('src','Leeds_PC_to_OA.csv')))
@@ -114,3 +117,75 @@ build_DocTermMatrix <- function(lower_bound = 0.05, upper_bound = 0.8, corpus) {
   
   return(DTM)
 }
+
+
+count_MSOAs <- function(dataframe, geojsonfile) {
+  
+  # perform incident counting
+  lsoa_full <- as.data.frame(
+    table(unlist(strsplit(as.character(dataframe$MSOA), ','), recursive=FALSE))
+  )
+  
+  colnames(lsoa_full) <- c('code','freq')
+  
+  # get all output area names
+  OA_names <- data.frame(geojsonfile$MSOA11CD)
+  
+  colnames(OA_names) <- c('code')
+  
+  # if there are missing MSOA codes in the counts of MSOAs
+  if (length(OA_names$code[OA_names$code %!in% lsoa_full$code]) != 0) {
+    
+    # create a dataframe of MSOA codes with a count of 0
+    missing_df <- data.frame(OA_names$code[OA_names$code %!in% lsoa_full$code], 0)
+    
+    # rename column headers
+    colnames(missing_df) <- c('code','freq')
+    
+    # row bind these new 0 rows to existing counts per msoa to lsoa_full
+    lsoa_full <- rbind(lsoa_full, missing_df)
+    
+  }
+  # if the dataframe ever changes the 2nd column selected here changes by the number of columns added/removed
+  # must select the strsplit col and CrimeNotes col
+  reports <- dataframe %>%
+    transform(MSOA = strsplit(as.character(MSOA),',')) %>%
+    unnest(MSOA)
+  
+  reports <- reports %>%
+    group_by(MSOA) %>%
+    summarise(CrimeNotes = paste(CrimeNotes, collapse = '<br> <br>'))
+  
+  names(reports) <- c('code','CrimeNotes')
+  
+  lsoa_full <- left_join(lsoa_full, reports, by = 'code')
+  
+  # return final ordered lsoa plus counts
+  lsoa_full <- lsoa_full[match(geojsonfile@data$MSOA11CD, lsoa_full$code),]
+ 
+  ret_list <- list('OA_count' = lsoa_full,
+                   'text_reports' = reports)
+  
+  return(ret_list)
+}
+
+map_Months <- function(dataframe) {
+  
+  mon_str <- c('Jan','Feb','Mar',
+               'Apr','May','Jun',
+               'Jul','Aug','Sep',
+               'Oct','Nov','Dec')
+  
+  mon_int <- c(1, 2, 3, 4,
+               5, 6, 7, 8,
+               9, 10, 11, 12)
+  
+  dataframe$Month2 <- plyr::mapvalues(dataframe$Month,
+                                from=mon_str,
+                                to=mon_int)
+  
+  dataframe$Month2 <- as.numeric(as.character(dataframe$Month2))
+  
+  return(dataframe)
+}
+
