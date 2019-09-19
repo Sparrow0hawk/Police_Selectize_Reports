@@ -1,6 +1,6 @@
 PackratFormat: 1.4
 PackratVersion: 0.5.0
-RVersion: 3.6.1
+RVersion: 3.4.4
 Repos: CRAN=https://cran.rstudio.com/
 
 Package: BH
@@ -12,6 +12,11 @@ Package: DBI
 Source: CRAN
 Version: 1.0.0
 Hash: 6abedd7919c4457604c0aa44529a6683
+
+Package: NLP
+Source: CRAN
+Version: 0.2-0
+Hash: 660c32b070874e08a4d2abaeb3e82443
 
 Package: R6
 Source: CRAN
@@ -548,6 +553,11 @@ Version: 0.7.1
 Hash: 9ff3e3d1aa83d9ae9b75c6f31e982aa6
 Requires: htmltools, promises, shiny
 
+Package: slam
+Source: CRAN
+Version: 0.1-45
+Hash: 853ab9e3d2ffa5f655ab1d3696c941c3
+
 Package: sourcetools
 Source: CRAN
 Version: 0.1.7
@@ -614,6 +624,12 @@ Source: CRAN
 Version: 0.16
 Hash: 569143c7e98bfbd9727b462b57276b09
 Requires: xfun
+
+Package: tm
+Source: CRAN
+Version: 0.7-6
+Hash: cecf3a5d97acaa98277759fd0dd86ef4
+Requires: BH, NLP, Rcpp, slam, xml2
 
 Package: units
 Source: CRAN
