@@ -4,6 +4,7 @@ library(shiny)
 library(leaflet)
 library(shinydashboard)
 library(geojsonio)
+library(reshape2)
 library(plotly)
 
 # load data sources
@@ -20,7 +21,7 @@ police_dataframe <- extract_MSOA(police_dataframe, PC_to_LSOA)
 
 ### Section getting LAD MSOA map
 
-geomapfile <- get_geojson(police_dataframe)
+geojsonfile <- get_geojson(police_dataframe)
 
 
 ### produce corpus
@@ -80,6 +81,82 @@ ui <- dashboardPage(
 
 # Define server logic required to draw a histogram
 server <- function(input, output) {
+    
+    observeEvent({input$submit_text},{
+        # lets build in a level of reactivity so a user can specify a key word
+        terms <- as.character(input$keyword_text)
+        
+        if (terms == ""){
+            
+            reduced_DTM <- as.matrix(DTM)
+            
+        } else{
+            # perform quick regex formatting to create list of strings
+            
+            terms <- tolower(trimws(unlist(strsplit(terms, ","))))
+            
+            accepted_terms <- list()
+            
+            rejected_terms <- list()
+            
+            for (x in terms){
+                if (x %in% DTM$dimnames$Terms){
+                    accepted_terms[[length(accepted_terms)+1]] <- x
+                }else{
+                    rejected_terms[[length(rejected_terms)+1]] <- x
+                }
+            }
+            
+            # ensure DTM has acceptable terms to slice
+            # if not return whole DTM
+            if (length(accepted_terms) != 0){
+                reduced_DTM <- as.matrix(DTM[,unlist(accepted_terms)])
+            }else{
+                reduced_DTM <- as.matrix(DTM)
+            }
+            
+            if (length(rejected_terms) != 0) {
+                output$rejected_terms <- renderUI(HTML("<font color =\"#FF0000\"><b>",'The following terms were not found:',
+                                                       paste0(unlist(rejected_terms), collapse=' '),"</b></font>"))
+            }
+            
+            
+        }
+
+        counts_per_decade <- aggregate(reduced_DTM, by = list(Month = police_dataframe$Month), sum)
+
+        wordcountsdecade.tall <- melt(counts_per_decade,
+                                      variable.name = 'Word',
+                                      value.names = 'count',
+                                      id.vars = ('Month'))
+        print('runs past topic model bit')
+        
+        # x axis specification
+        axaxis <- list(
+            title = 'Months',
+            tick0 = 1,
+            dtick = 1
+            #ticklen = 25,
+            #ticklen
+        )
+        
+        # actual plotly call to shiny ui
+        # x axis already defined in previous plot
+        output$wordbymonth <- renderPlotly(
+            plot_ly(wordcountsdecade.tall, x = ~Month,
+                    y= wordcountsdecade.tall$value,
+                    type = 'scatter',
+                    name = wordcountsdecade.tall$Word,
+                    mode = 'lines',
+                    text = wordcountsdecade.tall$Word,
+                    hoverinfo = 'text+x+y') %>%
+                layout(title = "Word occurence over time",
+                       xaxis = axaxis,
+                       yaxis = list (title = "Counts",
+                                     showline = TRUE),
+                       showlegend = FALSE)
+        )
+    })
 
     output$mymap <- renderLeaflet({
         leafletOptions(maxZoom = 10)
