@@ -22,6 +22,15 @@ police_dataframe <- extract_MSOA(police_dataframe, PC_to_LSOA)
 
 geomapfile <- get_geojson(police_dataframe)
 
+
+### produce corpus
+
+text_corpus <- tokenize_corpus(police_dataframe$CrimeNotes)
+
+# get doctermmatrix
+DTM <- build_DocTermMatrix(0.05, 0.8, text_corpus)
+
+
 ### UI section ###
 
 header <-  dashboardHeader(title = 'LDA Viewer')

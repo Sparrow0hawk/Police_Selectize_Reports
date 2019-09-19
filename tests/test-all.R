@@ -3,7 +3,10 @@ library(here)
 
 source(here('R','police-selectize-functions.R'))
 
+# helper function
+'%!in%' <- function(x,y)!('%in%'(x,y))
 
+#main functions
 test_that("test_load_data", {
   
   csv_path <- here('tests','test_data','test_load.csv')
@@ -42,5 +45,28 @@ test_that("test_get_geojson", {
   getfile <- get_geojson(test_df)
   
   expect_equal(as.character(getfile@data[[1]][1]), 'E02002330')
+  
+})
+
+test_that("test_tokenize", {
+  
+  test_text <- data.frame(read.csv(here('tests','test_data','test_tokenize.csv')))
+  
+  tokens <- tokenize_corpus(test_text$free_text)
+  
+  expect_equal(grep("[[:punct:]]", as.character(tokens[[1]])), integer(0) )
+  
+  expect_true(strsplit(as.character(tokens[[2]]), ' ')[[1]][2] == 'crib')
+  
+})
+
+
+test_that("test_getDTM", {
+  
+  data <- data.frame(read.csv(here('tests','test_data','test_DTM.csv')))
+  
+  DTM <- build_DocTermMatrix(0.05, 0.8, Corpus(VectorSource(data$tokens)))
+  
+  expect_true(DTM$dimnames$Terms[1] == 'jesus')
   
 })

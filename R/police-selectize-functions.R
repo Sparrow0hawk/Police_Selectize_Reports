@@ -2,6 +2,7 @@
 library(tidyverse)
 library(here)
 library(geojsonio)
+library(tm)
 
 
 load_data <- function(csv_file) {
@@ -69,5 +70,47 @@ get_geojson <- function(dataframe) {
 }
   
   
+tokenize_corpus <- function(input_text) {
+  
+  # performs simple preprocessing of tokens
+  # removes punctuation and converts all to lowercase
+  # returns processed corpus object
+  # remove basic english stopwords
+  
+  free_text <- enc2utf8(as.character(input_text))
+  
+  text_corpus <- Corpus(VectorSource(free_text))
+  
+  text_corpus <- tm_map(text_corpus, removePunctuation)
+  
+  text_corpus <- tm_map(text_corpus, content_transformer(tolower))
+  
+  #Strip digits
+  text_corpus <- tm_map(text_corpus, removeNumbers)
+  
+  #remove stopwords
+  text_corpus <- tm_map(text_corpus, removeWords, stopwords("english"))
+  #remove whitespace
+  
+  text_corpus <- tm_map(text_corpus, stripWhitespace)
+  
+  return(text_corpus)
+}
   
   
+build_DocTermMatrix <- function(lower_bound = 0.05, upper_bound = 0.8, corpus) {
+  # function for building the document-term matrix with upper and lower bounds
+  
+  # control settings for documentTermMatrix
+  # set lower bound (no words that occur in less than 5% of docs)
+  minDocFreq <- length(corpus) * lower_bound
+  
+  # set upper bound (no words that occur in more than 80% of docs)
+  maxDocFreq <- length(corpus) * upper_bound
+  
+  # create DocumentTermMatrix
+  DTM <- DocumentTermMatrix(corpus, control = list(bounds = list(global = c(minDocFreq, maxDocFreq))))
+  
+  
+  return(DTM)
+}
