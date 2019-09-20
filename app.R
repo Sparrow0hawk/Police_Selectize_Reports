@@ -51,7 +51,7 @@ body <- dashboardBody(
             # text input section
             textInput(inputId = 'keyword_text', label = 'Enter keyword(s):', value = ""),
             htmlOutput(outputId = 'rejected_terms'),
-            actionButton(inputId = 'submit_text', label = 'Submit'),
+            actionButton(inputId = 'submit_text', label = 'Submit', value = ''),
         # time slider
             sliderInput('MonYear','Select a Month over 1 year:',
                         min = min(1),
@@ -88,117 +88,124 @@ server <- function(input, output) {
     
     observeEvent(
         {input$submit_text
-         input$MonYear}, {
-             
-             new_pol_frame <- police_dataframe[which(police_dataframe$Month2 %in% c(input$MonYear[1]:input$MonYear[2])),]
-             
-             lsoa_full <- count_MSOAs(new_pol_frame, geojsonfile)$OA_count
-             
-             reports <- count_MSOAs(new_pol_frame, geojsonfile)$text_reports
-             
-             ### produce corpus
-             
-             text_corpus <- tokenize_corpus(new_pol_frame$CrimeNotes)
-             
-             # get doctermmatrix
-             DTM <- build_DocTermMatrix(0.05, 0.8, text_corpus)
-        
-        
-        # lets build in a level of reactivity so a user can specify a key word
-        terms <- as.character(input$keyword_text)
-        
-        if (terms == ""){
-            
-            reduced_DTM <- as.matrix(DTM)
-            
-        } else{
-            # perform quick regex formatting to create list of strings
-            
-            terms <- tolower(trimws(unlist(strsplit(terms, ","))))
-            
-            accepted_terms <- list()
-            
-            rejected_terms <- list()
-            
-            for (x in terms){
-                if (x %in% DTM$dimnames$Terms){
-                    accepted_terms[[length(accepted_terms)+1]] <- x
-                }else{
-                    rejected_terms[[length(rejected_terms)+1]] <- x
+            input$MonYear}, {
+                
+                print('Runs here')
+                new_pol_frame <- police_dataframe[which(police_dataframe$Month2 %in% c(input$MonYear[1]:input$MonYear[2])),]
+                
+                print('Runs Here')
+                lsoa_full <- count_MSOAs(new_pol_frame, geojsonfile)$OA_count
+                
+                reports <- count_MSOAs(new_pol_frame, geojsonfile)$text_reports
+                
+                ### produce corpus
+                
+                text_corpus <- tokenize_corpus(new_pol_frame$CrimeNotes)
+                
+                # get doctermmatrix
+                DTM <- build_DocTermMatrix(0.05, 0.8, text_corpus)
+                print('Runs dtm')
+                
+                # lets build in a level of reactivity so a user can specify a key word
+                
+                terms <- as.character(input$keyword_text)
+                
+                if (terms == "") {
+                    
+                    reduced_DTM <- as.matrix(DTM)
+                    
+                } else{
+                    
+                    # perform quick regex formatting to create list of strings
+                    
+                    terms <- tolower(trimws(unlist(strsplit(terms, ","))))
+                    
+                    accepted_terms <- list()
+                    
+                    rejected_terms <- list()
+                    
+                    for (x in terms) {
+                        if (x %in% DTM$dimnames$Terms) {
+                            accepted_terms[[length(accepted_terms) + 1]] <- x
+                        }else{
+                            rejected_terms[[length(rejected_terms) + 1]] <- x
+                        }
+                    }
+                    
+                    # ensure DTM has acceptable terms to slice
+                    # if not return whole DTM
+                    if (length(accepted_terms) != 0) {
+                        reduced_DTM <- as.matrix(DTM[,unlist(accepted_terms)])
+                    }else{
+                        reduced_DTM <- as.matrix(DTM)
+                    }
+                    
+                    if (length(rejected_terms) != 0) {
+                        output$rejected_terms <- renderUI(HTML("<font color =\"#FF0000\"><b>",'The following terms were not found:',
+                                                               paste0(unlist(rejected_terms), collapse = ' '),"</b></font>"))
+                    }
+                    
+                    
                 }
-            }
-            
-            # ensure DTM has acceptable terms to slice
-            # if not return whole DTM
-            if (length(accepted_terms) != 0){
-                reduced_DTM <- as.matrix(DTM[,unlist(accepted_terms)])
-            }else{
-                reduced_DTM <- as.matrix(DTM)
-            }
-            
-            if (length(rejected_terms) != 0) {
-                output$rejected_terms <- renderUI(HTML("<font color =\"#FF0000\"><b>",'The following terms were not found:',
-                                                       paste0(unlist(rejected_terms), collapse=' '),"</b></font>"))
-            }
-            
-            
-        }
-
-        counts_per_decade <- aggregate(reduced_DTM, 
-                                       by = list(Month = new_pol_frame$Month2), 
-                                       sum)
-
-        wordcountsdecade.tall <- melt(counts_per_decade,
-                                      variable.name = 'Word',
-                                      value.names = 'count',
-                                      id.vars = ('Month')
-                                      )
-        
-        
-        # x axis specification
-        axaxis <- list(
-            title = 'Months',
-            tick0 = 1,
-            dtick = 1
-            #ticklen = 25,
-            #ticklen
-        )
-        
-        # actual plotly call to shiny ui
-        # x axis already defined in previous plot
-        output$wordbymonth <- renderPlotly(
-            plot_ly(wordcountsdecade.tall, x = ~Month,
-                    y= wordcountsdecade.tall$value,
-                    type = 'scatter',
-                    name = wordcountsdecade.tall$Word,
-                    mode = 'lines',
-                    text = wordcountsdecade.tall$Word,
-                    hoverinfo = 'text+x+y') %>%
-                layout(title = "Word occurence over time",
-                       xaxis = axaxis,
-                       yaxis = list (title = "Counts",
-                                     showline = TRUE),
-                       showlegend = FALSE)
-        )
-    })
-
-    pal <- colorNumeric(c('white', 'red'), domain = lsoa_full$freq)
+                
+                counts_per_decade <- aggregate(reduced_DTM, 
+                                               by = list(Month = new_pol_frame$Month2), 
+                                               sum)
+                
+                wordcountsdecade.tall <- melt(counts_per_decade,
+                                              variable.name = 'Word',
+                                              value.names = 'count',
+                                              id.vars = ('Month')
+                )
+                
+                
+                # x axis specification
+                axaxis <- list(
+                    title = 'Months',
+                    tick0 = 1,
+                    dtick = 1
+                    #ticklen = 25,
+                    #ticklen
+                )
+                
+                # actual plotly call to shiny ui
+                # x axis already defined in previous plot
+                output$wordbymonth <- renderPlotly(
+                    plot_ly(wordcountsdecade.tall, x = ~Month,
+                            y= wordcountsdecade.tall$value,
+                            type = 'scatter',
+                            name = wordcountsdecade.tall$Word,
+                            mode = 'lines',
+                            text = wordcountsdecade.tall$Word,
+                            hoverinfo = 'text+x+y') %>%
+                        layout(title = "Word occurence over time",
+                               xaxis = axaxis,
+                               yaxis = list (title = "Counts",
+                                             showline = TRUE),
+                               showlegend = FALSE)
+                )
+                
+                pal <- colorNumeric(c('white', 'red'), domain = lsoa_full$freq)
+                
+                output$mymap <- renderLeaflet({
+                    leafletOptions(maxZoom = 10)
+                    leaflet(geojsonfile) %>%
+                        addTiles() %>%
+                        addPolygons(data = geojsonfile,
+                                    stroke = TRUE,
+                                    color = "black",
+                                    fillOpacity=0.7,
+                                    fillColor = ~pal(lsoa_full$freq),
+                                    dashArray = 2,
+                                    weight = 0.7,
+                                    popup = paste(lsoa_full$CrimeNotes)
+                        ) 
+                    
+                })
+            })
     
-    output$mymap <- renderLeaflet({
-        leafletOptions(maxZoom = 10)
-        leaflet(geojsonfile) %>%
-            addTiles() %>%
-            addPolygons(data = geojsonfile,
-                        stroke = TRUE,
-                        color = "black",
-                        fillOpacity=0.7,
-                        fillColor = ~pal(lsoa_full$freq),
-                        dashArray = 2,
-                        weight = 0.7,
-                        popup = paste(lsoa_full$CrimeNotes)
-            ) 
-        
-    })
+    
+}
 }
 
 # Run the application 
