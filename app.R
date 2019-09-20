@@ -39,10 +39,19 @@ geojsonfile <- get_geojson(police_dataframe)
 
 ### UI section ###
 
-header <-  dashboardHeader(title = 'LDA Viewer')
+header <-  dashboardHeader(title = 'Selectize_Keywords',
+                           titleWidth = 450,
+                           )
 
 # main page panel
 body <- dashboardBody(
+    
+    tags$head(
+        tags$style(HTML('.main-header .logo {
+                         font-family: Serpentine, Verdana, sans-serif;
+                         font-size: 24px;
+                         }'))
+    ),
     
     # create a row for controls
     fluidRow(
@@ -52,7 +61,13 @@ body <- dashboardBody(
             textInput(inputId = 'keyword_text', label = 'Enter keyword(s):', value = ""),
             htmlOutput(outputId = 'rejected_terms'),
             actionButton(inputId = 'submit_text', label = 'Submit', value = ''),
-        # time slider
+            # select crime type
+            selectizeInput('crimeType', 'Select Crime Type: ',
+                           choices = unique(police_dataframe$CrimeType),
+                           selected = NULL,
+                           options = list(create = TRUE),
+                           multiple = FALSE),
+            # time slider
             sliderInput('MonYear','Select a Month over 1 year:',
                         min = min(1),
                         max = max(12),
@@ -78,9 +93,11 @@ body <- dashboardBody(
 
 # construct ui from parts
 ui <- dashboardPage(
+    
     header,
     dashboardSidebar(disable = TRUE),
-    body)
+    body,
+    skin = "red")
 
 
 # Define server logic required to draw a histogram
@@ -88,12 +105,18 @@ server <- function(input, output) {
     
     observeEvent(
         {input$submit_text
-            input$MonYear}, {
+            input$MonYear
+            input$crimeType}, {
                 
-                print('Runs here')
-                new_pol_frame <- police_dataframe[which(police_dataframe$Month2 %in% c(input$MonYear[1]:input$MonYear[2])),]
+                # filter by date
+                if (is.null(input$crimeType)) {
+                    new_pol_frame <- police_dataframe[which(police_dataframe$Month2 %in% c(input$MonYear[1]:input$MonYear[2])), ]
+                } else {
+                    new_pol_frame <- police_dataframe[which(police_dataframe$Month2 %in% c(input$MonYear[1]:input$MonYear[2]) 
+                                             & police_dataframe$CrimeType == input$crimeType), ]
+                }
                 
-                print('Runs Here')
+                print('Loads frame')
                 lsoa_full <- count_MSOAs(new_pol_frame, geojsonfile)$OA_count
                 
                 reports <- count_MSOAs(new_pol_frame, geojsonfile)$text_reports
@@ -206,7 +229,7 @@ server <- function(input, output) {
     
     
 }
-}
+
 
 # Run the application 
 shinyApp(ui = ui, server = server)
