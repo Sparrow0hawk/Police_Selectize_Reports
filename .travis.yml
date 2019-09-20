@@ -3,6 +3,12 @@ language: r
 sudo: false
 r: 3.4.1
 
+# getting travis error when installing Installing units (0.6-4) ... 
+addons:
+  apt:
+    packages:
+      - libudunits2-dev
+
 branches:
   only:
     - master
