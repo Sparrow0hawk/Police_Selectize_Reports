@@ -9,6 +9,7 @@ addons:
       - libudunits2-dev
       - libv8-dev
       - libprotobuf-dev
+      - protobuf-compiler
 
 branches:
   only:
