@@ -92,9 +92,7 @@ body <- dashboardBody(
 )
 
 # construct ui from parts
-ui <- dashboardPage(
-    
-    header,
+ui <- dashboardPage(header,
     dashboardSidebar(disable = TRUE),
     body,
     skin = "red")
