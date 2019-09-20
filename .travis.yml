@@ -16,7 +16,11 @@ branches:
 
 install:
   # to solve travis ci error when installing V8
+<<<<<<< HEAD
   - R -e 'source("https://install-github.me/r-lib/remotes")'
+=======
+  R -e 'source("https://install-github.me/r-lib/remotes")'
+>>>>>>> 1614aaf34d9f0a0a92b50a162773c86b710726b9
   - R -e 'if (system.file(package="packrat") == "") install.packages("packrat")'
   - R -e "packrat::packify(); packrat::restore()"
 
