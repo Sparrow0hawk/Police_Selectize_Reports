@@ -40,7 +40,7 @@ geojsonfile <- get_geojson(police_dataframe)
 ### UI section ###
 
 header <-  dashboardHeader(title = 'Selectize_Keywords',
-                           titleWidth = 450,
+                           titleWidth = 450
                            )
 
 # main page panel
@@ -86,7 +86,8 @@ body <- dashboardBody(
         column(width = 4,
                box(width = NULL,
                    solidHeader = FALSE,
-                   plotlyOutput("wordbymonth"))
+                   plotlyOutput("wordbymonth"),
+                   plotlyOutput("termfreqmonth"))
         )
     )
 )
@@ -124,12 +125,16 @@ server <- function(input, output) {
                 text_corpus <- tokenize_corpus(new_pol_frame$CrimeNotes)
                 
                 # get doctermmatrix
-                DTM <- build_DocTermMatrix(0.05, 0.8, text_corpus)
+                DTM <- build_DocTermMatrix(0.01, 0.8, text_corpus)
                 print('Runs dtm')
                 
                 # lets build in a level of reactivity so a user can specify a key word
                 
                 terms <- as.character(input$keyword_text)
+                
+                accepted_terms <- list()
+                
+                rejected_terms <- list()
                 
                 if (terms == "") {
                     
@@ -141,14 +146,10 @@ server <- function(input, output) {
                     
                     terms <- tolower(trimws(unlist(strsplit(terms, ","))))
                     
-                    accepted_terms <- list()
-                    
-                    rejected_terms <- list()
-                    
                     for (x in terms) {
                         if (x %in% DTM$dimnames$Terms) {
                             accepted_terms[[length(accepted_terms) + 1]] <- x
-                        }else{
+                        } else {
                             rejected_terms[[length(rejected_terms) + 1]] <- x
                         }
                     }
@@ -189,6 +190,39 @@ server <- function(input, output) {
                     #ticklen
                 )
                 
+                ### section to build stacked barplot
+                if (length(accepted_terms) != 0) {
+                    
+                    term_in_month <- monthly_term_vol(DTM, new_pol_frame, terms = unlist(accepted_terms))
+                    
+                }else{
+                    term_in_month <- monthly_term_vol(DTM, new_pol_frame, terms = NULL)
+                
+                    }
+                
+                term_in_month.tall <- melt(term_in_month,
+                                              variable.name = 'Word',
+                                              value.names = 'count',
+                                              id.vars = ('Month')
+                )
+                
+                termfreqplot <- plot_ly(term_in_month.tall, x = ~Month,
+                                        y = term_in_month.tall$value,
+                                        type = 'bar',
+                                        name = term_in_month.tall$Word,
+                                        text = term_in_month.tall$Word,
+                                        hoverinfo = 'text+x+y') %>%
+                    layout(title = "Term occurence within month",
+                           xaxis = axaxis,
+                           yaxis = list (title = "Counts",
+                                         showline = TRUE),
+                           showlegend = FALSE)
+                
+                # actual plotly call to shiny ui
+                # x axis already defined in previous plot
+                output$termfreqmonth <- renderPlotly(termfreqplot)
+                
+                ### plot word frequency over time
                 # actual plotly call to shiny ui
                 # x axis already defined in previous plot
                 output$wordbymonth <- renderPlotly(

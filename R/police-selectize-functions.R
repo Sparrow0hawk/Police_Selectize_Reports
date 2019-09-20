@@ -189,3 +189,37 @@ map_Months <- function(dataframe) {
   return(dataframe)
 }
 
+monthly_term_vol <- function(DTM, dataframe, terms) {
+  # function to calculate the monthly volume of a given term
+  
+  # create the docterm as matrix
+  mat_DTM <- mat_DTM <- as.matrix(DTM)
+  
+  # determine terms use by month
+  DTM_by_month <- aggregate((mat_DTM), 
+                            by = list(Month = dataframe$Month2), 
+                            function(x)sum(x != 0))
+  
+  # get total documents per month
+  total_docs_month <- aggregate(rowSums(mat_DTM), 
+                                by = list(Month = dataframe$Month2), 
+                                function(x)sum(x != 0))
+  
+  # specify columns
+  colnames(total_docs_month) <- c('Month','Totals')
+  
+  combined_frame <- DTM_by_month %>%
+    left_join(total_docs_month,
+              by = c('Month' = 'Month'))
+  
+  if (length(terms) != 0) {
+    
+    combined_frame <- combined_frame[,c('Month',terms, 'Totals')]
+  } else {
+    
+    combined_frame <- combined_frame[, c('Month','Totals'), drop=FALSE]
+  }
+  
+  return(combined_frame)
+}
+

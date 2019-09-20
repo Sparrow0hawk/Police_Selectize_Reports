@@ -1,5 +1,6 @@
 library(testthat)
 library(here)
+library(tm)
 
 source(here('R','police-selectize-functions.R'))
 
@@ -98,3 +99,30 @@ test_that("test_toMonth", {
   expect_equal(new_frame$Month2[6], 9)
 })
 
+test_that("test_monthly_term_vol", {
+  
+  test_data <- data.frame(read.csv(here('tests','test_data','test_volDTM.csv')))
+  
+  corpus1 <- Corpus(VectorSource(enc2utf8(as.character(test_data$CrimeNotes))))
+  
+  funcs <- list(tolower, removePunctuation, removeNumbers,
+                stripWhitespace)
+  
+  crude1 <- tm_map(corpus1, FUN = tm_reduce, tmFuns = funcs)
+  
+  DTM <- DocumentTermMatrix(corpus1)
+  
+  test_output <- monthly_term_vol(DTM, test_data, terms=NULL)
+  
+  expect_equal(test_output[test_output$Month == 2,]$Totals, 2)
+  
+  expect_equal(colnames(test_output), c('Month','Totals'))
+  
+  test_output <- monthly_term_vol(DTM, test_data, terms='force')
+  
+  expect_equal(test_output[test_output$Month == 2,]$force, 1)
+  
+  expect_equal(colnames(test_output), c('Month','force','Totals'))
+  
+  
+})
