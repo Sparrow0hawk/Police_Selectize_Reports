@@ -8,6 +8,7 @@ addons:
     packages:
       - libudunits2-dev
       - libv8-dev
+      - libprotobuf-dev
 
 branches:
   only:
