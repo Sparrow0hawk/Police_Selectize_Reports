@@ -8,6 +8,7 @@ addons:
   apt:
     packages:
       - libudunits2-dev
+      - libnode-dev
 
 branches:
   only:
