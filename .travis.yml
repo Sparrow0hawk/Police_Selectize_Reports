@@ -3,7 +3,7 @@ language: r
 sudo: false
 r: 3.4.1
 
-# getting travis error when installing Installing units (0.6-4) ... 
+# getting travis error when installing Installing units (0.6-4) ...
 addons:
   apt:
     packages:
@@ -15,6 +15,8 @@ branches:
     - develop
 
 install:
+  # to solve travis ci error when installing V8
+  R -e 'source("https://install-github.me/r-lib/remotes")'
   - R -e 'if (system.file(package="packrat") == "") install.packages("packrat")'
   - R -e "packrat::packify(); packrat::restore()"
 
