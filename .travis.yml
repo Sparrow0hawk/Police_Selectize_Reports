@@ -15,6 +15,12 @@ addons:
       - libgdal-dev
       - libnetcdf-dev
 
+r_packages:
+  - covr
+
+after_success:
+  - Rscript -e 'library(covr); codecov()'
+
 branches:
   only:
     - master
