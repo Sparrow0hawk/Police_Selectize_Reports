@@ -11,6 +11,9 @@ addons:
       - libprotobuf-dev
       - protobuf-compiler
       - libjq-dev
+      - libgeos-dev
+      - libgdal-dev
+      - libnetcdf-dev
 
 branches:
   only:
