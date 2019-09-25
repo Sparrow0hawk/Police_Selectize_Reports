@@ -7,4 +7,7 @@ packrat/lib*/
 packrat/src/
 .Rproj.user
 
-# new line for push
+packrat/*
+!packrat/packrat.lock
+!packrat/init.R
+!packrat/packrat.opts
