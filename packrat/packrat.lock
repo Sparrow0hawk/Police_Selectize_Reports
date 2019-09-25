@@ -13,6 +13,13 @@ Source: CRAN
 Version: 1.0.0
 Hash: 6abedd7919c4457604c0aa44529a6683
 
+Package: DT
+Source: CRAN
+Version: 0.9
+Hash: f72fd6ee6cf1656384503d6c7ca6cd96
+Requires: crosstalk, htmltools, htmlwidgets, jsonlite, magrittr,
+    promises
+
 Package: NLP
 Source: CRAN
 Version: 0.2-0

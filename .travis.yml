@@ -19,7 +19,7 @@ r_packages:
   - covr
 
 after_success:
-  - Rscript -e 'library(covr); codecov()'
+  - Rscript -e 'library(covr); covr::codecov(coverage = covr::file_coverage('R/police-selectize-functions.R', 'tests/test-all.R'))'
 
 
 branches:
