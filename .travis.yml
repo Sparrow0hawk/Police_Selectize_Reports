@@ -1,4 +1,26 @@
 language: r
+sudo: false
+r: 3.4.1
+
+# getting travis error when installing Installing units (0.6-4) ...
+addons:
+  apt:
+    packages:
+      - libudunits2-dev
+      - libv8-dev
+      - libprotobuf-dev
+      - protobuf-compiler
+      - libjq-dev
+      - libgeos-dev
+      - libgdal-dev
+      - libnetcdf-dev
+
+r_packages:
+  - covr
+
+after_success:
+  - Rscript -e 'library(covr); codecov()'
+
 
 branches:
   only:

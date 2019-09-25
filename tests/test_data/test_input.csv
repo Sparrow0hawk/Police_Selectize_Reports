@@ -1,0 +1,13 @@
+,Identifier,CrimeType,OccType,Day,Month,PartialPostCode,MODescription,CrimeNotes,HOClass,OffenceRec,DomViol
+1,URN001,Burglary,Burg,Mon,Jan,LS53,assault,Walter went to town to eat a burger,BG1,001/1,N
+2,URN002,Violence and Sexual Offences,Burg,Tue,Feb,LS14,assault,Suspect entered property and hit victim with force,BG1,001/1,N
+3,URN003,Other crime ,Burg,Wed,Feb,LS167,assault,Suspect's bike was removed from bike rack,BG1,001/1,N
+4,URN004,Violence and Sexual Offences,Burg,Wed,Dec,LS12,assault,Victim was struck twice with wooden pole in garden of suspect,BG1,001/1,N
+5,URN005,Robbery,Burg,Fri,Mar,LS197,assault,Suspect stopped victim in alley intimidated into handing over mobile phone,BG1,001/1,N
+6,URN006,Robbery,Burg,Sat,Sep,LS42,assault,Victim was walking down street when suspect threatened victim with concealed knife and made off with purse,BG1,001/1,N
+7,URN007,Burglary,Burg,Mon,Jan,LS53,assault,Walter went to town to eat a burger,BG1,001/1,N
+8,URN008,Violence and Sexual Offences,Burg,Tue,Feb,LS14,assault,Suspect entered property and hit victim with force,BG1,001/1,N
+9,URN009,Other crime ,Burg,Wed,Feb,LS167,assault,Suspect's bike was removed from bike rack,BG1,001/1,N
+10,URN010,Violence and Sexual Offences,Burg,Wed,Dec,LS12,assault,Victim was struck twice with wooden pole in garden of suspect,BG1,001/1,N
+11,URN011,Robbery,Burg,Fri,Mar,LS197,assault,Suspect stopped victim in alley intimidated into handing over mobile phone,BG1,001/1,N
+12,URN012,Robbery,Burg,Sat,Sep,LS42,assault,Victim was walking down street when suspect threatened victim with concealed knife and made off with purse,BG1,001/1,N

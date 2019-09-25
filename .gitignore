@@ -1,10 +1,13 @@
 # gitignore file for Police Selectize reports
 
-# packrat
+# R stuff
+.Rhistory
+.Rproj.user/*
+packrat/lib*/
+packrat/src/
+.Rproj.user
 
 packrat/*
 !packrat/packrat.lock
 !packrat/init.R
 !packrat/packrat.opts
-
-.Rproj.user/*
