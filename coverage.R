@@ -7,4 +7,5 @@ covfile <- covr::file_coverage(
                                here('tests','test-all.R')
                                ) 
 
-covr::codecov(coverage = covfile)
+covr::codecov(coverage = covfile,
+              token = Sys.getenv("CODECOV_TOKEN"))
