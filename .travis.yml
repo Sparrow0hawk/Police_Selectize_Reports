@@ -19,8 +19,7 @@ r_packages:
   - covr
 
 after_success:
-  - Rscript -e 'library(covr); codecov()'
-
+  - R -f coverage.R
 
 branches:
   only:

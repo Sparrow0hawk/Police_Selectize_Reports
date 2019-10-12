@@ -1,6 +1,6 @@
 PackratFormat: 1.4
 PackratVersion: 0.5.0
-RVersion: 3.4.4
+RVersion: 3.6.1
 Repos: CRAN=https://cran.rstudio.com/
 
 Package: BH
@@ -12,6 +12,13 @@ Package: DBI
 Source: CRAN
 Version: 1.0.0
 Hash: 6abedd7919c4457604c0aa44529a6683
+
+Package: DT
+Source: CRAN
+Version: 0.9
+Hash: f72fd6ee6cf1656384503d6c7ca6cd96
+Requires: crosstalk, htmltools, htmlwidgets, jsonlite, magrittr,
+    promises
 
 Package: NLP
 Source: CRAN
@@ -100,6 +107,12 @@ Package: colorspace
 Source: CRAN
 Version: 1.4-1
 Hash: 60a56e9998b8b58ee378db3dc91b27a5
+
+Package: covr
+Source: CRAN
+Version: 3.3.1
+Hash: 51ae655e7c4a457ea3457bf90fe5249f
+Requires: crayon, digest, httr, jsonlite, rex, withr, yaml
 
 Package: crayon
 Source: CRAN
@@ -480,6 +493,12 @@ Source: CRAN
 Version: 1.4.3
 Hash: b7ea8a2e7a9df39c2346e78bd83e26f8
 Requires: Rcpp, plyr, stringr
+
+Package: rex
+Source: CRAN
+Version: 1.1.2
+Hash: 57541aaae58f1a284a398f5c62c95097
+Requires: lazyeval, magrittr
 
 Package: rgdal
 Source: CRAN
